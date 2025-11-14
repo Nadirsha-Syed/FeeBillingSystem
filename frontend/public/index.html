@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fee Payment System - Login</title>
+    <title>Fee Payment System - Login/Register</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container" style="max-width: 400px; margin-top: 100px;">
+    <div class="container" style="max-width: 400px; margin-top: 50px;">
         <h1 style="text-align: center;">Online Fee Payment System</h1>
         
-        <div id="login-form">
+        <p id="message" style="color: red; text-align: center; font-weight: bold;"></p>
+        
+        <div id="login-form-container">
             <h2 style="text-align: center;">Login</h2>
             
-            <p id="message" style="color: red; text-align: center; font-weight: bold;"></p>
-            
-            <form id="auth-form">
-                <input type="email" id="email" placeholder="Email" required 
+            <form id="login-form-data">
+                <input type="email" id="login-email" placeholder="Email" required 
                        style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
                 
-                <input type="password" id="password" placeholder="Password" required
+                <input type="password" id="login-password" placeholder="Password" required
                        style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
                 
                 <button type="submit" id="login-btn" 
@@ -29,7 +29,45 @@
             </form>
             
             <p style="text-align: center; margin-top: 15px;">
-                New User? (Admin/Student Registration happens via API testing tool for now)
+                New User? <a href="#" id="show-register-link">Register Here</a>
+            </p>
+        </div>
+
+        <div id="register-form-container" style="display: none;">
+            <h2 style="text-align: center;">Register New User</h2>
+            
+            <form id="register-form-data">
+                <input type="text" id="reg-name" placeholder="Full Name" required 
+                       style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
+                
+                <input type="email" id="reg-email" placeholder="Email" required 
+                       style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
+                
+                <input type="password" id="reg-password" placeholder="Password" required
+                       style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
+                
+                <select id="reg-role" required 
+                        style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
+                    <option value="">Select Role</option>
+                    <option value="Student">Student</option>
+                    <option value="Admin">Admin (for internal use)</option>
+                </select>
+
+                <div id="student-fields" style="display: none;">
+                    <input type="text" id="reg-course" placeholder="Course (e.g., B.Tech)" 
+                           style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
+                    <input type="text" id="reg-year" placeholder="Year (e.g., 3rd)" 
+                           style="width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc;">
+                </div>
+                
+                <button type="submit" id="register-btn" 
+                        style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px; margin-top: 10px;">
+                    Register
+                </button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 15px;">
+                Already have an account? <a href="#" id="show-login-link">Login Here</a>
             </p>
         </div>
     </div>

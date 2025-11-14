@@ -200,5 +200,52 @@ router.get('/total-students', protect, admin, async (req, res) => {
     }
 });
 
+// ----------------------------------------------------
+// 7. GET /api/fees/pending-list: Admin gets detailed list of pending/overdue assignments (New Requirement)
+// @access: Private (Admin Only)
+// ----------------------------------------------------
+router.get('/pending-list', protect, admin, async (req, res) => {
+    try {
+        const pendingList = await FeeAssignment.aggregate([
+            {
+                // 1. Filter only 'Pending' or 'Overdue' statuses
+                $match: {
+                    status: { $in: ['Pending', 'Overdue'] }
+                }
+            },
+            {
+                // 2. Lookup the student details from the 'users' collection
+                $lookup: {
+                    from: 'users', // The target collection name (Mongoose pluralizes to lowercase)
+                    localField: 'studentId',
+                    foreignField: '_id',
+                    as: 'studentInfo'
+                }
+            },
+            {
+                // 3. Deconstruct the studentInfo array
+                $unwind: '$studentInfo'
+            },
+            {
+                // 4. Project (Select) the final fields to return
+                $project: {
+                    _id: 1,
+                    studentId: '$studentInfo._id',
+                    studentName: '$studentInfo.name',
+                    feeName: 1,
+                    amount: 1,
+                    dueDate: 1,
+                    status: 1
+                }
+            }
+        ]);
+
+        res.json(pendingList);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error retrieving pending list.');
+    }
+});
+
 
 module.exports = router;

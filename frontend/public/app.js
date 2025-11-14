@@ -1,58 +1,127 @@
-const API_URL = 'http://localhost:5000/api'; // Base API URL
+// Define API_URL globally
+const API_URL = 'http://localhost:5000/api';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. On every page load, check if the user is authenticated
-    checkAuthAndRedirect();
+    // Attempt automatic redirection if a token exists
+    // We are COMMENTING OUT the initial checkAuthAndRedirect() call
+    // checkAuthAndRedirect(); // <--- REMOVE OR COMMENT OUT THIS LINE
 
-    // 2. Attach login handler to the form/button on the index page
-    const loginBtn = document.getElementById('login-btn');
-    const authForm = document.getElementById('auth-form');
-
-    if (authForm) {
-        // Prevent default form submission and use our async handler
-        authForm.addEventListener('submit', (e) => {
+    // --- Authentication Form Handlers ---
+    
+    // Handler for Login Form Submission (using the ID from index.html)
+    const loginForm = document.getElementById('login-form-data');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             handleLogin();
         });
     }
     
-    // Attach logout globally for use on dashboard pages
-    window.logout = logout;
-});
-
-/**
- * Checks for token/role and handles redirects based on authentication status.
- */
-function checkAuthAndRedirect() {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
-    const currentPath = window.location.pathname;
-
-    // If no token, and we are not on the login page, redirect to login
-    if (!token && !currentPath.includes('index.html') && currentPath !== '/') {
-        window.location.href = 'index.html';
-        return;
+    // Handler for Registration Form Submission
+    const registerForm = document.getElementById('register-form-data');
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleRegistration(); // Calls the new registration function
+        });
     }
     
-    // If authenticated, ensure the user is on the correct dashboard
-    if (token) {
-        if (currentPath.includes('admin.html') && role !== 'Admin') {
-            window.location.href = 'student.html';
-        } else if (currentPath.includes('student.html') && role !== 'Student') {
-            window.location.href = 'admin.html';
+    // --- UI Toggle Handlers ---
+    document.getElementById('show-register-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleViews(false); // Show registration
+    });
+
+    document.getElementById('show-login-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleViews(true); // Show login
+    });
+
+    // Handle role change to show/hide student fields
+    document.getElementById('reg-role').addEventListener('change', (e) => {
+        const studentFields = document.getElementById('student-fields');
+        if (e.target.value === 'Student') {
+            studentFields.style.display = 'block';
+        } else {
+            studentFields.style.display = 'none';
         }
+    });
+
+    window.logout = logout; // Make logout globally available
+});
+
+// --- UI Toggle Function ---
+function toggleViews(showLogin) {
+    document.getElementById('login-form-container').style.display = showLogin ? 'block' : 'none';
+    document.getElementById('register-form-container').style.display = showLogin ? 'none' : 'block';
+    document.getElementById('message').textContent = ''; // Clear messages on switch
+}
+
+// -------------------------------------------------------------------
+// CORE LOGIC: REGISTRATION (NEW FUNCTION)
+// -------------------------------------------------------------------
+async function handleRegistration() {
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+    const role = document.getElementById('reg-role').value;
+    
+    const course = document.getElementById('reg-course').value;
+    const year = document.getElementById('reg-year').value;
+
+    const messageElement = document.getElementById('message');
+    messageElement.textContent = 'Registering...';
+    messageElement.style.color = 'blue';
+
+    const body = { name, email, password, role };
+
+    // Conditionally add student fields and validate
+    if (role === 'Student') {
+        if (!course || !year) {
+            messageElement.textContent = 'Please fill in Course and Year for Student registration.';
+            messageElement.style.color = 'red';
+            return;
+        }
+        body.course = course;
+        body.year = year;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            messageElement.textContent = 'Registration successful! You can now log in.';
+            messageElement.style.color = 'green';
+            toggleViews(true); // Switch back to login view
+        } else {
+            messageElement.textContent = data.msg || 'Registration failed.';
+            messageElement.style.color = 'red';
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        messageElement.textContent = 'Network error during registration.';
+        messageElement.style.color = 'red';
     }
 }
 
-/**
- * Handles the user login process by calling the backend API.
- */
+
+// -------------------------------------------------------------------
+// CORE LOGIC: LOGIN (UPDATED TO USE NEW INPUT IDs)
+// -------------------------------------------------------------------
 async function handleLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    // NOTE: Updated element IDs to match the new index.html structure
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
     const messageElement = document.getElementById('message');
 
     messageElement.textContent = 'Logging in...';
+    messageElement.style.color = 'blue';
 
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
@@ -78,6 +147,7 @@ async function handleLogin() {
 
             messageElement.textContent = 'Login successful!';
 
+            // THIS BLOCK REMAINS ACTIVE to redirect only AFTER successful login
             if (role === 'Admin') {
                 window.location.href = 'admin.html';
             } else if (role === 'Student') {
@@ -85,21 +155,43 @@ async function handleLogin() {
             }
         } else {
             messageElement.textContent = data.msg || 'Login failed. Check credentials.';
+            messageElement.style.color = 'red';
         }
     } catch (error) {
         console.error('Login error:', error);
         messageElement.textContent = 'Network error. Could not connect to server.';
+        messageElement.style.color = 'red';
     }
 }
 
-/**
- * Clears local storage and redirects to the login page.
- */
+
+// --- Helper Functions ---
+function checkAuthAndRedirect() {
+    // This function is now only used to check if an unauthenticated user 
+    // is trying to access a dashboard directly.
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const currentPath = window.location.pathname;
+
+    // If no token, and we are not on the login page, redirect to login
+    if (!token && !currentPath.includes('index.html') && currentPath !== '/') {
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // The redirect logic here is no longer needed at the root, 
+    // but remains if you want authenticated users hitting dashboard URLs to redirect correctly.
+    if (token) {
+        if (role === 'Admin' && !currentPath.includes('admin.html')) {
+            window.location.href = 'admin.html';
+        } else if (role === 'Student' && !currentPath.includes('student.html')) {
+            window.location.href = 'student.html';
+        }
+    }
+}
+
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     window.location.href = 'index.html';
 }
-
-// Make sure the login handler is globally accessible if needed
-window.handleLogin = handleLogin;
