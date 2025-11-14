@@ -120,8 +120,7 @@ router.put('/simulate/:id', protect, async (req, res) => {
 // @access  Private (Admin Only)
 // ----------------------------------------------------
 router.get('/reports/summary', protect, admin, async (req, res) => {
-    // NOTE: The server prefix /api/fees/ combined with this path makes the full URL:
-    // /api/fees/reports/summary
+    // Full URL: /api/fees/reports/summary
     try {
         // Use MongoDB aggregation to group by status and sum the amounts
         const summary = await FeeAssignment.aggregate([
@@ -149,6 +148,55 @@ router.get('/reports/summary', protect, admin, async (req, res) => {
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error generating report summary.');
+    }
+});
+
+
+// ----------------------------------------------------
+// 5. GET /api/fees/receipt/:id: Get full payment record for receipt (Download Feature)
+// @access: Private (Student Only)
+// ----------------------------------------------------
+router.get('/receipt/:id', protect, async (req, res) => {
+    const paymentId = req.params.id;
+
+    if (req.user.role !== 'Student') {
+        return res.status(403).json({ msg: 'Access denied. Student account required.' });
+    }
+
+    try {
+        const paymentRecord = await FeeAssignment.findById(paymentId);
+        
+        if (!paymentRecord) {
+            return res.status(404).json({ msg: 'Payment record not found.' });
+        }
+
+        // Security check: Only the owner can view the receipt
+        if (paymentRecord.studentId.toString() !== req.user.id) {
+            return res.status(403).json({ msg: 'Access denied.' });
+        }
+        
+        // Return the payment details as JSON
+        res.json(paymentRecord);
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error retrieving receipt.');
+    }
+});
+
+
+// ----------------------------------------------------
+// 6. GET /api/fees/total-students: Admin gets student count
+// @access: Private (Admin Only)
+// ----------------------------------------------------
+router.get('/total-students', protect, admin, async (req, res) => {
+    try {
+        // Use the User model to count documents where role is 'Student'
+        const studentCount = await User.countDocuments({ role: 'Student' });
+        res.json({ count: studentCount });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error retrieving student count.');
     }
 });
 
