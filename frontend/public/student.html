@@ -15,8 +15,26 @@
     
     <main class="container">
         <h2>My Fee Assignments</h2>
+        
+        <div class="kpi-cards" style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 15px; margin-bottom: 30px;">
+            
+            <div class="kpi-card" style="border: 1px solid #ccc; padding: 15px; text-align: center; flex: 1; min-width: 200px; border-radius: 8px;">
+                <p style="font-size: 1em; margin-bottom: 5px; color: #3498db;">Total Fees</p>
+                <p id="total-assigned-fees" style="font-size: 1.8em; font-weight: bold; color: #3498db;">$0.00</p>
+            </div>
+
+            <div class="kpi-card" style="border: 1px solid #ccc; padding: 15px; text-align: center; flex: 1; min-width: 200px; border-radius: 8px;">
+                <p style="font-size: 1em; margin-bottom: 5px; color: green;">Total Paid</p>
+                <p id="total-paid-fees" style="font-size: 1.8em; font-weight: bold; color: green;">$0.00</p>
+            </div>
+
+            <div class="kpi-card" style="border: 1px solid #ccc; padding: 15px; text-align: center; flex: 1; min-width: 200px; border-radius: 8px;">
+                <p style="font-size: 1em; margin-bottom: 5px; color: orange;">Total Pending</p>
+                <p id="total-pending-fees" style="font-size: 1.8em; font-weight: bold; color: orange;">$0.00</p>
+            </div>
+
+        </div>
         <div id="loading-message">Loading fees...</div>
-        <p id="fee-summary">Total Due: $0.00</p>
         
         <table id="fees-table">
             <thead>
