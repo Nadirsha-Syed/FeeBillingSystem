@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Fee System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+</head>
+<body>
+    <header>
+        <h1>Student Fee Portal</h1>
+        <button onclick="logout()">Logout</button>
+    </header>
+    
+    <main class="container">
+        <h2>My Fee Assignments</h2>
+        <div id="loading-message">Loading fees...</div>
+        <p id="fee-summary">Total Due: $0.00</p>
+        
+        <table id="fees-table">
+            <thead>
+                <tr>
+                    <th>Fee Name</th>
+                    <th>Amount Due</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="fees-table-body">
+                </tbody>
+        </table>
+
+        <div id="receipt-area" style="display: none; margin-top: 20px; padding: 15px; border: 1px solid #ccc;">
+            <h3>Payment Successful!</h3>
+            <p>Transaction ID: <span id="receipt-txn-id"></span></p>
+            <p>Amount Paid: $<span id="receipt-amount"></span></p>
+            <button onclick="document.getElementById('receipt-area').style.display='none'">Close Receipt</button>
+        </div>
+    </main>
+
+    <script src="app.js"></script> 
+    <script src="student.js"></script>
+</body>
+</html>

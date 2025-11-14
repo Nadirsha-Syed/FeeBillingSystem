@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Fee System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+</head>
+<body>
+    <header>
+        <h1>Admin Fee Management Portal</h1>
+        <button onclick="logout()">Logout</button>
+    </header>
+    
+    <main class="container">
+        <p id="admin-message" style="color: green; font-weight: bold; text-align: center;"></p>
+        
+        <div class="dashboard-sections">
+            
+            <section class="assignment-section">
+                <h2>Fee Assignment (POST /api/fees/assign)</h2>
+                <form id="fee-assignment-form">
+                    <input type="text" id="studentId" placeholder="Student ID (MongoDB _id)" required>
+                    <input type="text" id="feeName" placeholder="Fee Name (e.g., Tuition Fee)" required>
+                    <input type="number" id="amount" placeholder="Amount (e.g., 50000)" required>
+                    <input type="date" id="dueDate" required>
+                    <button type="submit">Assign Fee</button>
+                </form>
+            </section>
+            
+            <hr>
+
+            <section class="reports-section">
+                <h2>Fee Collection Summary (GET /api/reports/summary)</h2>
+                
+                <div class="report-metrics">
+                    <p>Total Collected: <span id="total-collected">$0.00</span></p>
+                    <p>Total Pending/Overdue: <span id="total-remaining">$0.00</span></p>
+                </div>
+
+                <div class="chart-container" style="max-width: 500px; margin: 20px auto;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </section>
+            
+            <hr>
+
+            <section class="pending-section">
+                <h2>Pending/Overdue Assignments</h2>
+                <table id="pending-fees-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Fee Name</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-fees-table-body">
+                        <tr><td colspan="4">Loading pending data...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="app.js"></script> 
+    <script src="admin.js"></script>
+</body>
+</html>
